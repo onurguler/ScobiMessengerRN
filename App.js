@@ -7,66 +7,41 @@
  */
 
 import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+import {SafeAreaView, StatusBar} from 'react-native';
+import 'react-native-gesture-handler';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import SignInScreen from './src/screens/SignInScreen';
+
+const Stack = createStackNavigator();
 
 const App = () => {
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Home Screen</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{title: 'Chats'}}
+          />
+          <Stack.Screen
+            name="SignIn"
+            component={SignInScreen}
+            options={{
+              headerLeft: null,
+              title: 'Sign In',
+              gestureEnabled: false,
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+      <SafeAreaView />
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-    height: '100%',
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
