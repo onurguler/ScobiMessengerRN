@@ -75,23 +75,10 @@ export class SignUpScreen extends Component {
       [inputName]: inputValue,
     }));
 
-    let {
-      firstName,
-      lastName,
-      username,
-      email,
-      password1,
-      password2,
-    } = this.state;
+    let {username, email, password1, password2} = this.state;
 
     // fix form validation
     switch (inputName) {
-      case 'firstName':
-        firstName = inputValue;
-        break;
-      case 'lastName':
-        lastName = inputValue;
-        break;
       case 'username':
         username = inputValue;
         break;
