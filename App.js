@@ -12,7 +12,7 @@ import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as eva from '@eva-design/eva';
-import {ApplicationProvider, Button} from '@ui-kitten/components';
+import {ApplicationProvider} from '@ui-kitten/components';
 
 import HomeScreen from './src/screens/HomeScreen';
 import SignInScreen from './src/screens/SignInScreen';
@@ -38,11 +38,6 @@ const App = ({navigation}) => {
               headerLeft: null,
               title: 'Sign In',
               gestureEnabled: false,
-              headerRight: () => (
-                <Button appearance="ghost" onPress={() => ''}>
-                  Sign Up
-                </Button>
-              ),
             }}
           />
           <Stack.Screen

@@ -8,13 +8,48 @@ import {
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Text, Input, Button} from '@ui-kitten/components';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export class SignInScreen extends Component {
+  state = {
+    username: '',
+    password: '',
+  };
+
   _onPressSignUp = () => {
     this.props.navigation.navigate('SignUp');
   };
 
+  _onPressSignIn = () => {
+    const {username, password} = this.state;
+
+    fetch('http://192.168.1.106:8000/api/accounts/auth/login/', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({username, password}),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const token = data.token;
+        if (token) {
+          AsyncStorage.setItem('token', token).then(() => {
+            AsyncStorage.setItem('logged_in', JSON.stringify(true)).then(() => {
+              this.props.navigation.replace('Home');
+            });
+          });
+        }
+      })
+      .catch((error) => {
+        console.warn(error);
+      });
+  };
+
   render() {
+    const {username, password} = this.state;
+
     return (
       <KeyboardAvoidingView
         style={styles.container}
@@ -37,6 +72,8 @@ export class SignInScreen extends Component {
               autoCapitalize="none"
               autoCompleteType="off"
               autoCorrect={false}
+              value={username}
+              onChangeText={(text) => this.setState({username: text})}
             />
             <Input
               style={styles.input}
@@ -45,8 +82,12 @@ export class SignInScreen extends Component {
               autoCompleteType="off"
               autoCorrect={false}
               secureTextEntry={true}
+              value={password}
+              onChangeText={(text) => this.setState({password: text})}
             />
-            <Button style={styles.button}>Continue</Button>
+            <Button style={styles.button} onPress={this._onPressSignIn}>
+              Continue
+            </Button>
             <View style={styles.bodyBottom}>
               <Text>Don't have an account?</Text>
               <Button appearance="ghost" onPress={this._onPressSignUp}>
