@@ -1,17 +1,12 @@
 import React, {Component} from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import {View, StyleSheet, KeyboardAvoidingView, Platform} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Text, Input, Button} from '@ui-kitten/components';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 
-export class SignInScreen extends Component {
-  _onPressSignUp = () => {
-    this.props.navigation.navigate('SignUp');
+export class SignUpScreen extends Component {
+  _onPressSignIn = () => {
+    this.props.navigation.goBack();
   };
 
   render() {
@@ -19,18 +14,25 @@ export class SignInScreen extends Component {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView
+        <KeyboardAwareScrollView
           style={styles.scrollView}
-          contentContainerStyle={styles.scrollViewContentContainer}
-          keyboardShouldPersistTaps="always"
-          keyboardDismissMode="on-drag">
+          contentContainerStyle={styles.scrollViewContentContainer}>
           <View style={styles.body}>
             <Text style={styles.title} category="h3">
               Scobi Messenger
             </Text>
             <Text style={styles.subtitle} category="s1" appearance="hint">
-              Sign in to continue...
+              Sign up to continue...
             </Text>
+            <Input style={styles.input} placeholder="First Name" />
+            <Input style={styles.input} placeholder="Last Name" />
+            <Input
+              style={styles.input}
+              placeholder="Email"
+              autoCapitalize="none"
+              autoCompleteType="email"
+              autoCorrect={false}
+            />
             <Input
               style={styles.input}
               placeholder="Username"
@@ -46,15 +48,23 @@ export class SignInScreen extends Component {
               autoCorrect={false}
               secureTextEntry={true}
             />
+            <Input
+              style={styles.input}
+              placeholder="Password (Repeat)"
+              autoCapitalize="none"
+              autoCompleteType="off"
+              autoCorrect={false}
+              secureTextEntry={true}
+            />
             <Button style={styles.button}>Continue</Button>
             <View style={styles.bodyBottom}>
               <Text>Don't have an account?</Text>
-              <Button appearance="ghost" onPress={this._onPressSignUp}>
-                Sign Up
+              <Button appearance="ghost" onPress={this._onPressSignIn}>
+                Sign In
               </Button>
             </View>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </KeyboardAvoidingView>
     );
   }
@@ -97,4 +107,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignInScreen;
+export default SignUpScreen;
