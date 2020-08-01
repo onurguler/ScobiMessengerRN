@@ -110,7 +110,11 @@ export class HomeScreen extends Component {
     return (
       <View style={styles.body}>
         <View style={styles.sectionContainer}>
-          <ConversationList conversations={conversations} username={username} />
+          <ConversationList
+            navigation={this.props.navigation}
+            conversations={conversations}
+            username={username}
+          />
         </View>
       </View>
     );

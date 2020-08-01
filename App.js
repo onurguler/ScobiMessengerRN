@@ -17,6 +17,7 @@ import {ApplicationProvider} from '@ui-kitten/components';
 import HomeScreen from './src/screens/HomeScreen';
 import SignInScreen from './src/screens/SignInScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
+import ChatScreen from './src/screens/ChatScreen';
 
 const Stack = createStackNavigator();
 
@@ -44,6 +45,11 @@ const App = ({navigation}) => {
             name="SignUp"
             component={SignUpScreen}
             options={{title: 'Sign Up'}}
+          />
+          <Stack.Screen
+            name="Chat"
+            component={ChatScreen}
+            options={({route}) => ({title: route.params.name})}
           />
         </Stack.Navigator>
       </NavigationContainer>

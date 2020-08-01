@@ -8,9 +8,17 @@ const formatDate = (value) => {
   return date.toISOString().substr(11, 5);
 };
 
-const ConversationList = ({conversations, username}) => {
+const ConversationList = ({conversations, username, navigation}) => {
   const renderItem2 = ({item}) => (
     <ListItem
+      onPress={() => {
+        const toUser = item.participants.filter(
+          (participant) => participant.username !== username,
+        )[0];
+        const toUserUsername = toUser.username;
+        const name = toUser.first_name + ' ' + toUser.last_name;
+        navigation.navigate('Chat', {username: toUserUsername, name: name});
+      }}
       title={() => (
         <Text category="h5" numberOfLines={1}>
           {item.participants
