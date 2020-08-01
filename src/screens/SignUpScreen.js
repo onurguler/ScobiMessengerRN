@@ -3,7 +3,8 @@ import {View, StyleSheet, KeyboardAvoidingView, Platform} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Text, Input, Button} from '@ui-kitten/components';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
-import AsyncStorage from '@react-native-community/async-storage';
+import {connect} from 'react-redux';
+import {register} from '../redux/actions/auth';
 
 export class SignUpScreen extends Component {
   state = {
@@ -44,29 +45,7 @@ export class SignUpScreen extends Component {
       password: password1,
     };
 
-    fetch('http://192.168.1.106:8000/api/accounts/auth/register/', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({...formData}),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const token = data.token;
-        if (token) {
-          AsyncStorage.setItem('token', token).then(() => {
-            AsyncStorage.setItem('logged_in', JSON.stringify(true)).then(() => {
-              this.props.navigation.popToTop();
-              this.props.navigation.replace('Home');
-            });
-          });
-        }
-      })
-      .catch((error) => {
-        console.warn(error);
-      });
+    this.props.register(formData);
   };
 
   _handleInputChange = (inputName, inputValue) => {
@@ -236,4 +215,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUpScreen;
+export default connect(null, {register})(SignUpScreen);

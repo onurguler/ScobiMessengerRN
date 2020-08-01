@@ -4,116 +4,38 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import ConversationList from '../components/ConversationList';
 
-export class HomeScreen extends Component {
-  state = {
-    username: '',
-    token: '',
-    conversations: [],
-  };
+import {connect} from 'react-redux';
+import {loadUser} from '../redux/actions/auth';
+import {getConversations} from '../redux/actions/chat';
 
-  constructor() {
-    super();
+export class HomeScreen extends Component {
+  constructor(props) {
+    super(props);
     // if user not logged in navigate to sign in screen
     // else fetch authenticated user
+    // AsyncStorage.clear();
     AsyncStorage.getItem('logged_in').then((value) => {
       const isLoggedIn = JSON.parse(value);
       if (!isLoggedIn) {
-        this.props.navigation.replace('SignIn');
+        props.navigation.replace('SignIn');
       } else {
-        AsyncStorage.getItem('token').then((token) => {
-          fetch('http://192.168.1.106:8000/api/accounts/auth/', {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-              Authorization: `Token ${token}`,
-            },
-          })
-            .then((response) => {
-              if (response.status === 401) {
-                AsyncStorage.setItem('logged_in', JSON.stringify(false)).then(
-                  () => {
-                    Alert.alert(
-                      'Error',
-                      'Your auth session ended. Please sign in again.',
-                    );
-                    // this.props.navigation.popToTop();
-                    this.props.navigation.replace('SignIn');
-                  },
-                );
-                return null;
-              } else {
-                return response.json();
-              }
-            })
-            .then((data) => {
-              if (data === null) {
-                return;
-              }
-
-              const {uuid, first_name, last_name, username} = data;
-
-              this.setState({username});
-
-              AsyncStorage.setItem('uuid', uuid);
-              AsyncStorage.setItem('first_name', first_name);
-              AsyncStorage.setItem('last_name', last_name);
-              AsyncStorage.setItem('username', username);
-            })
-            .catch((error) => {
-              console.warn(error);
-            });
-
-          fetch('http://192.168.1.106:8000/api/chat/conversations/', {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-              Authorization: `Token ${token}`,
-            },
-          })
-            .then((response) => {
-              if (response.status === 401) {
-                AsyncStorage.setItem('logged_in', JSON.stringify(false)).then(
-                  () => {
-                    Alert.alert(
-                      'Error',
-                      'Your auth session ended. Please sign in again.',
-                    );
-                    // this.props.navigation.popToTop();
-                    this.props.navigation.replace('SignIn');
-                  },
-                );
-                return null;
-              } else {
-                return response.json();
-              }
-            })
-            .then((data) => {
-              if (data === null) {
-                return;
-              }
-
-              this.setState({conversations: data});
-            })
-            .catch((error) => {
-              console.warn(error);
-            });
+        props.loadUser().then((success) => {
+          if (success) {
+            props.getConversations();
+          }
         });
       }
     });
   }
 
   render() {
-    const {username, conversations} = this.state;
-
     return (
       <View style={styles.body}>
         <View style={styles.sectionContainer}>
           <ConversationList
             navigation={this.props.navigation}
-            conversations={conversations}
-            username={username}
+            conversations={this.props.conversations}
+            username={this.props.currentUserUsername}
           />
         </View>
       </View>
@@ -132,4 +54,11 @@ const styles = StyleSheet.create({
   sectionContainer: {},
 });
 
-export default HomeScreen;
+const mapStateToProps = (state) => ({
+  conversations: state.chat.conversations,
+  currentUserUsername: state.auth.user && state.auth.user.username,
+});
+
+export default connect(mapStateToProps, {loadUser, getConversations})(
+  HomeScreen,
+);
