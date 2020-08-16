@@ -1,14 +1,38 @@
 import React, {Component} from 'react';
 import {GiftedChat} from 'react-native-gifted-chat';
+import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
-import {getUserChatMessages} from '../redux/actions/chat';
+import {
+  getUserChatMessages,
+  sendMessageToUser,
+  addMessageToCurrentChat,
+} from '../redux/actions/chat';
+import {socketEndPoint} from '../redux/api';
 
 export class ChatScreen extends Component {
   constructor(props) {
     super(props);
     const {username} = props.route.params;
     props.getUserChatMessages(username);
+
+    AsyncStorage.getItem('token').then((token) => {
+      const socket = new WebSocket(
+        `${socketEndPoint}/chat/${username}/?token=${token}`,
+      );
+
+      socket.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        const message = JSON.parse(data.message);
+        props.addMessageToCurrentChat(message);
+      };
+    });
   }
+
+  onSend = (messages) => {
+    const text = messages[0].text;
+    const {username} = this.props.route.params;
+    this.props.sendMessageToUser(username, text);
+  };
 
   render() {
     return (
@@ -18,7 +42,7 @@ export class ChatScreen extends Component {
             ? this.props.currentChat.messages
             : []
         }
-        // onSend={messages => onSend(messages)}
+        onSend={(messages) => this.onSend(messages)}
         user={{
           _id:
             this.props.auth &&
@@ -35,4 +59,8 @@ const mapStateToProps = (state) => ({
   currentChat: state.chat.currentChat,
 });
 
-export default connect(mapStateToProps, {getUserChatMessages})(ChatScreen);
+export default connect(mapStateToProps, {
+  getUserChatMessages,
+  sendMessageToUser,
+  addMessageToCurrentChat,
+})(ChatScreen);

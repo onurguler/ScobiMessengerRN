@@ -3,6 +3,7 @@ import {
   GET_CONVERSATIONS,
   GET_CHAT_MESSAGES,
   UPDATE_CURRENT_CHAT,
+  UPDATE_CURRENT_CHAT_MESSAGES,
 } from './types';
 import {endPoint} from '../api';
 
@@ -57,4 +58,40 @@ export const getUserChatMessages = (username) => async (dispatch) => {
       payload: messages,
     });
   } catch (err) {}
+};
+
+export const sendMessageToUser = (username, text) => async (dispatch) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const body = JSON.stringify({text});
+
+  try {
+    const res = await axios.post(
+      `${endPoint}/api/chat/user/${username}/send/`,
+      body,
+      config,
+    );
+  } catch (err) {}
+};
+
+export const addMessageToCurrentChat = (message) => (dispatch) => {
+  let newMessage = {
+    _id: message.id,
+    text: message.text,
+    createdAt: new Date(message.created_at),
+    user: {
+      _id: message.owner.uuid,
+      name: message.owner.first_name + ' ' + message.owner.last_name,
+      avatar: 'https://placeimg.com/140/140/any',
+    },
+  };
+
+  dispatch({
+    type: UPDATE_CURRENT_CHAT_MESSAGES,
+    payload: newMessage,
+  });
 };
